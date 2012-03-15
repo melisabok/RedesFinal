@@ -18,8 +18,9 @@ Datos = [2,2,2,1;
 
 [CantRows, CantCols] = size(Datos);
 
-popsize = 3;
-elitismo = 1;  % el mejor NO se mueve
+popsize = 3;   % tamanio de la poblacion
+indsize = 2;   % tamanio del individuo, cantidad de reglas en la solucion
+elitismo = 0;  % el mejor NO se mueve
 
 MAX_ITERA = 500;
 
@@ -32,16 +33,16 @@ W = [1.5; 0.2];
 limVELOC = [-0.5; 0.5];  %== intervalo en el que puede variar la velocidad ==
 
 %[cmax, limites, paso, NroFunc] = ElegirFuncion;
-limites = [0,3;
+limites = [0, 3;
            0, 2;
            0, 2];
        
-Pop = CrearPoblacionInicial(popsize, limites, limVELOC);
+Pop = CrearPoblacionInicial(popsize, indsize, limites, limVELOC);
 
 itera = 0;
 fitgBest = 0;
 igualMejor = 0;
-gBest = [0, 0, 0];
+gBest = zeros(indsize, 3);
 
 Pop = EvaluarFitness(Datos(:,1:3), Datos(:,4), 1, Pop);
 
@@ -50,11 +51,11 @@ Pop
 while (itera < MAX_ITERA) & (igualMejor < 0.1 * MAX_ITERA)
 
       for i=1:popsize
-         if Pop(i).fitness > Pop(i).fitpBest
+         if sum(Pop(i).fitness) > sum(Pop(i).fitpBest)
              Pop(i).pBest = Pop(i).individuo;
              Pop(i).fitpBest = Pop(i).fitness;
          end
-         if Pop(i).fitness > fitgBest
+         if sum(Pop(i).fitness) > sum(fitgBest)
              gBest = Pop(i).individuo;
              fitgBest = Pop(i).fitness;
          end
@@ -64,7 +65,15 @@ while (itera < MAX_ITERA) & (igualMejor < 0.1 * MAX_ITERA)
      %==========================
      % recordar quien es el mejor y donde esta
      [FitMaxAnt, quienAnt] = max([Pop.fitness]);
-     MejorIndividuo = Pop(quienAnt);
+     popindex = round(quienAnt / indsize);
+     indindex = mod(quienAnt, indsize);
+     if(indindex == 0)
+         indindex = indsize;
+     end
+     
+     popindex
+     indindex
+     MejorIndividuo = Pop(popindex).individuo(indindex,:);
      
      MejorIndividuo
      igualMejor
@@ -73,17 +82,24 @@ while (itera < MAX_ITERA) & (igualMejor < 0.1 * MAX_ITERA)
  
      
      for i=1:popsize
-         Pop(i).velocidad = w_inercia * Pop(i).velocidad + alfa1*rand*(sum(Pop(i).pBest-Pop(i).individuo)) + alfa2*rand*(sum(gBest-Pop(i).individuo));
- 
-         %verificar que la velocidad no se vaya de rango
-         Pop(i).velocidad = max( limVELOC(1), Pop(i).velocidad );
-         Pop(i).velocidad = min( limVELOC(2), Pop(i).velocidad );
-         
-         Pop(i).individuo = Pop(i).individuo + Pop(i).velocidad;
-         
-         %validar que el individuo no se vaya de los limites permitidos
-         Pop(i).individuo = max( limites(1), Pop(i).individuo );
-         Pop(i).individuo = min( limites(2), Pop(i).individuo );
+         Pop(i).velocidad = w_inercia * Pop(i).velocidad + alfa1*rand*(Pop(i).pBest-Pop(i).individuo) + alfa2*rand*(gBest-Pop(i).individuo);
+         for k=1:indsize
+             for j=1:3
+                 %verificar que la velocidad no se vaya de rango
+                 Pop(i).velocidad(k,j) = max( limVELOC(1), Pop(i).velocidad(k,j) );
+                 Pop(i).velocidad(k,j) = min( limVELOC(2), Pop(i).velocidad(k,j) );
+
+                 Pop(i).individuo(k,j) = round(Pop(i).individuo(k,j) + Pop(i).velocidad(k,j));
+
+                 %validar que el individuo no se vaya de los limites permitidos
+                 Pop(i).individuo(k,j) = max( limites(j, 1), Pop(i).individuo(k,j) );
+                 Pop(i).individuo(k,j) = min( limites(j, 2), Pop(i).individuo(k,j) );
+             end
+         end
+         velocidad = Pop(i).velocidad;
+         individuo = Pop(i).individuo;
+         velocidad
+         individuo
      end
      
      Pop = EvaluarFitness(Datos(:,1:3), Datos(:,4), 1, Pop);
