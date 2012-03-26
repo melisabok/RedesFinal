@@ -65,18 +65,8 @@ while (itera < MAX_ITERA) & (igualMejor < 0.1 * MAX_ITERA)
      %==========================
      % recordar quien es el mejor y donde esta
      [FitMaxAnt, quienAnt] = max([Pop.fitness]);
-     popindex = round(quienAnt / indsize);
-     indindex = mod(quienAnt, indsize);
-     if(indindex == 0)
-         indindex = indsize;
-     end
+     MejorIndividuo = Pop(quienAnt);
      
-     popindex
-     indindex
-     MejorIndividuo = Pop(popindex).individuo(indindex,:);
-     
-     MejorIndividuo
-     igualMejor
      %== las particulas cada vez se mueven menos ===
      w_inercia = W(1) - ( W(1) - W(2) ) * (itera / MAX_ITERA);
  
@@ -86,20 +76,33 @@ while (itera < MAX_ITERA) & (igualMejor < 0.1 * MAX_ITERA)
          for k=1:indsize
              for j=1:3
                  %verificar que la velocidad no se vaya de rango
-                 Pop(i).velocidad(k,j) = max( limVELOC(1), Pop(i).velocidad(k,j) );
-                 Pop(i).velocidad(k,j) = min( limVELOC(2), Pop(i).velocidad(k,j) );
+                 %Pop(i).velocidad(k,j) = max( limVELOC(1), Pop(i).velocidad(k,j) );
+                 %Pop(i).velocidad(k,j) = min( limVELOC(2), Pop(i).velocidad(k,j) );
 
-                 Pop(i).individuo(k,j) = round(Pop(i).individuo(k,j) + Pop(i).velocidad(k,j));
+                 %Pop(i).individuo(k,j) = round(Pop(i).individuo(k,j) + Pop(i).velocidad(k,j));
+                 
+                 %verificar que la velocidad no se vaya de rango
+                Pop(i).velocidad(find(Pop(i).velocidad<limVELOC(1)))=limVELOC(1);
+                Pop(i).velocidad(find(Pop(i).velocidad>limVELOC(2)))=limVELOC(2);
+
+                %CALCULO LA NUEVA POSICION DEL INDIVIDUO        
+                Pop(i).individuo = Pop(i).individuo + Pop(i).velocidad;
+                
+                %validar que el individuo no se vaya de los limites permitidos
+                %para todas las dimensiones que tiene el registro
+                for pp=1:indsize
+                    for j=1:3
+                        Pop(i).individuo(pp, j) = max( limites(j, 1), Pop(i).individuo(pp, j));
+                        Pop(i).individuo(pp, j) = min( limites(j, 2), Pop(i).individuo(pp, j));
+                    end
+                end
 
                  %validar que el individuo no se vaya de los limites permitidos
-                 Pop(i).individuo(k,j) = max( limites(j, 1), Pop(i).individuo(k,j) );
-                 Pop(i).individuo(k,j) = min( limites(j, 2), Pop(i).individuo(k,j) );
+                 %Pop(i).individuo(k,j) = max( limites(j, 1), Pop(i).individuo(k,j) );
+                 %Pop(i).individuo(k,j) = min( limites(j, 2), Pop(i).individuo(k,j) );
              end
          end
-         velocidad = Pop(i).velocidad;
-         individuo = Pop(i).individuo;
-         velocidad
-         individuo
+
      end
      
      Pop = EvaluarFitness(Datos(:,1:3), Datos(:,4), 1, Pop);
@@ -121,11 +124,10 @@ while (itera < MAX_ITERA) & (igualMejor < 0.1 * MAX_ITERA)
      
 end
 
-% disp(sprintf('\nIteraciones realizadas = %d',itera));
-% disp(sprintf('Mejor Individuo = %f',Pop(quien).individuo));
-% disp(sprintf('Aptitud del mejor individuo : %f',Pop(quien).fitness));
-% disp(sprintf('Velocidad del mejor individuo : %f',Pop(quien).velocidad));
-% disp(sprintf('Ultimo valor de inercia utilizado : %f',w_inercia));
-% 
-% disp(sprintf('El mejor individuo no ha sido superado en las ultimas %d iteraciones',igualMejor));
+disp(sprintf('\nIteraciones realizadas = %d',itera));
+disp(sprintf('Mejor Individuo = %f',Pop(quien).individuo));
+disp(sprintf('Aptitud del mejor individuo : %f',Pop(quien).fitness));
+disp(sprintf('Velocidad del mejor individuo : %f',Pop(quien).velocidad));
+disp(sprintf('Ultimo valor de inercia utilizado : %f',w_inercia));
+disp(sprintf('El mejor individuo no ha sido superado en las ultimas %d iteraciones',igualMejor));
 % 

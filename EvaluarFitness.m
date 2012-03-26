@@ -6,6 +6,7 @@ popsize = length(Pop);
 indsize = 2;
 
 for j=1:popsize
+    fitness = 0;
     for h=1:indsize
         antecedente = 0;
         correctos = 0;
@@ -27,8 +28,9 @@ for j=1:popsize
         confianza = correctos ./ antecedente;
         confianza(isnan(confianza))=0;  
         soporte = correctos ./ CantDatos;
-        fitness = (soporte + confianza) ./ (2);
-        Pop(j).fitness(h) = fitness;
+        fitness = fitness + (soporte + confianza) ./ (2);
     end
+    Pop(j).fitness = fitness;
+
 end
    
