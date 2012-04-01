@@ -19,8 +19,8 @@ Datos = [2,2,2,1;
 [CantRows, CantCols] = size(Datos);
 
 popsize = 3;   % tamanio de la poblacion
-indsize = 2;   % tamanio del individuo, cantidad de reglas en la solucion
-elitismo = 0;  % el mejor NO se mueve
+indsize = 3;   % tamanio del individuo, cantidad de reglas en la solucion
+elitismo = 1;  % el mejor NO se mueve
 
 MAX_ITERA = 500;
 
@@ -37,16 +37,20 @@ limites = [0, 3;
            0, 2;
            0, 2];
        
+X = Datos(:,1:3);
+Z = Datos(:,4);
+Clase = 1; 
+
 Pop = CrearPoblacionInicial(popsize, indsize, limites, limVELOC);
 
 itera = 0;
 fitgBest = 0;
+gBest = 0;
 igualMejor = 0;
-gBest = zeros(indsize, 3);
 
-Pop = EvaluarFitness(Datos(:,1:3), Datos(:,4), 1, Pop);
+Pop = EvaluarFitness(X, Z, Clase, Pop);
 
-Pop
+disp(Pop);
  
 while (itera < MAX_ITERA) & (igualMejor < 0.1 * MAX_ITERA)
 
@@ -86,7 +90,7 @@ while (itera < MAX_ITERA) & (igualMejor < 0.1 * MAX_ITERA)
                 Pop(i).velocidad(find(Pop(i).velocidad>limVELOC(2)))=limVELOC(2);
 
                 %CALCULO LA NUEVA POSICION DEL INDIVIDUO        
-                Pop(i).individuo = Pop(i).individuo + Pop(i).velocidad;
+                Pop(i).individuo = round(Pop(i).individuo + Pop(i).velocidad);
                 
                 %validar que el individuo no se vaya de los limites permitidos
                 %para todas las dimensiones que tiene el registro
@@ -94,9 +98,24 @@ while (itera < MAX_ITERA) & (igualMejor < 0.1 * MAX_ITERA)
                     for j=1:3
                         Pop(i).individuo(pp, j) = max( limites(j, 1), Pop(i).individuo(pp, j));
                         Pop(i).individuo(pp, j) = min( limites(j, 2), Pop(i).individuo(pp, j));
+                        
                     end
                 end
-
+                
+                indices = all(Pop(i).individuo == 0, 2);
+                [reglas indices_reglas] = find(indices > 0);
+                
+                % si hay reglas nulas
+                for index=1:length(indices_reglas)
+                    %busco una variable de la regla al azar
+                    indice_valor = round((3-1)*rand()) + 1;
+                    %busco un valor al azar
+                    valor = round((limites(indice_valor, 2)-1)*rand()) + 1;
+                    %le asigno ese valor a la regla para que deje ser nula
+                    Pop(i).individuo(reglas(index), indice_valor) = valor; 
+                end
+                
+ 
                  %validar que el individuo no se vaya de los limites permitidos
                  %Pop(i).individuo(k,j) = max( limites(j, 1), Pop(i).individuo(k,j) );
                  %Pop(i).individuo(k,j) = min( limites(j, 2), Pop(i).individuo(k,j) );
@@ -125,9 +144,11 @@ while (itera < MAX_ITERA) & (igualMejor < 0.1 * MAX_ITERA)
 end
 
 disp(sprintf('\nIteraciones realizadas = %d',itera));
-disp(sprintf('Mejor Individuo = %f',Pop(quien).individuo));
-disp(sprintf('Aptitud del mejor individuo : %f',Pop(quien).fitness));
-disp(sprintf('Velocidad del mejor individuo : %f',Pop(quien).velocidad));
-disp(sprintf('Ultimo valor de inercia utilizado : %f',w_inercia));
-disp(sprintf('El mejor individuo no ha sido superado en las ultimas %d iteraciones',igualMejor));
+disp(sprintf('\nMejor Individuo :'));
+disp(Pop(quien).individuo);
+disp(sprintf('\nAptitud del mejor individuo : %f',Pop(quien).fitness));
+disp(sprintf('\nVelocidad del mejor individuo :'));
+disp(Pop(quien).velocidad);
+disp(sprintf('\nUltimo valor de inercia utilizado : %f',w_inercia));
+disp(sprintf('\nEl mejor individuo no ha sido superado en las ultimas %d iteraciones',igualMejor));
 % 
