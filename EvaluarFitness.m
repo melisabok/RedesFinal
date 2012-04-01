@@ -30,7 +30,7 @@ for j=1:popsize
         soporte = correctos ./ CantDatos;
         fitness = fitness + (soporte + confianza) ./ (2);
     end
-    Pop(j).fitness = fitness;
+    Pop(j).fitness = (fitness / indsize);
 
 end
    
