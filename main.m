@@ -16,4 +16,8 @@ Datos = [2,2,2,1;
 1,1,1,0;
 1,2,2,1];
 
-PSO_Multi(Datos, 1, 3, 3, 1);
+datos = csvread('car-num.csv');
+clase = 4; % Very High
+cantReglas = 10;
+popSize = 20;
+PSO_Multi(datos, clase, cantReglas, popSize, 1);
