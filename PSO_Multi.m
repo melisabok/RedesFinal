@@ -1,22 +1,4 @@
-function[p] = PSO_Multi(Datos, Clase, CantReglas, popsize, elitismo) 
-
-    % clear
-    % clc
-    % 
-    % Datos = [2,2,2,1;
-    % 2,1,2,0;
-    % 3,2,2,1;
-    % 1,2,2,1;
-    % 1,2,1,0;
-    % 1,1,1,0;
-    % 3,1,1,1;
-    % 2,1,1,0;
-    % 2,2,1,1;
-    % 1,1,1,0;
-    % 2,2,1,1;
-    % 3,2,2,1;
-    % 1,1,1,0;
-    % 1,2,2,1];
+function[R] = PSO_Multi(Datos, Clase, CantReglas, popsize, elitismo) 
 
     [CantRows, CantCols] = size(Datos);
 
@@ -89,7 +71,7 @@ function[p] = PSO_Multi(Datos, Clase, CantReglas, popsize, elitismo)
 
          end
 
-         Pop = EvaluarFitness(Datos(:,1:3), Datos(:,4), 1, Pop);
+         Pop = EvaluarFitness(X, Z, 1, Pop);
          [FitMax, quien] = max([Pop.fitness]);
          if (elitismo==1)  & (FitMax < FitMaxAnt)
              % el mejor se movio y empeoro. Hay que recuperarlo y ponerlo donde estaba
