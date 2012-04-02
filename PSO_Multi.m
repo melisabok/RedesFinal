@@ -1,4 +1,4 @@
-function[R] = PSO_Multi(Datos, Clase, CantReglas, popsize, elitismo) 
+function[R] = PSO_Multi(Datos, clase, cantReglas, popsize, elitismo) 
 
     [CantRows, CantCols] = size(Datos);
 
@@ -9,10 +9,10 @@ function[R] = PSO_Multi(Datos, Clase, CantReglas, popsize, elitismo)
     %Cantidad de variables
     variables = CantCols - 1;
     %Cantidad de reglas que quiero obtener, tamanio del individuo
-    indsize = CantReglas;
+    indsize = cantReglas;
 
     %Parametros del PSO
-    MAX_ITERA = 500;
+    MAX_ITERA = 1000;
     alfa1 = 0.5;
     alfa2 = 0.5;
     %== Factor de inercia inicial y final
@@ -30,16 +30,16 @@ function[R] = PSO_Multi(Datos, Clase, CantReglas, popsize, elitismo)
     gBest = 0;
     igualMejor = 0;
 
-    Pop = EvaluarFitness(X, Z, Clase, Pop);
+    Pop = EvaluarFitness(X, Z, clase, Pop);
 
     while (itera < MAX_ITERA) & (igualMejor < 0.1 * MAX_ITERA)
 
           for i=1:popsize
-             if sum(Pop(i).fitness) > sum(Pop(i).fitpBest)
+             if Pop(i).fitness > Pop(i).fitpBest
                  Pop(i).pBest = Pop(i).individuo;
                  Pop(i).fitpBest = Pop(i).fitness;
              end
-             if sum(Pop(i).fitness) > sum(fitgBest)
+             if Pop(i).fitness > fitgBest
                  gBest = Pop(i).individuo;
                  fitgBest = Pop(i).fitness;
              end
@@ -71,7 +71,7 @@ function[R] = PSO_Multi(Datos, Clase, CantReglas, popsize, elitismo)
 
          end
 
-         Pop = EvaluarFitness(X, Z, 1, Pop);
+         Pop = EvaluarFitness(X, Z, clase, Pop);
          [FitMax, quien] = max([Pop.fitness]);
          if (elitismo==1)  & (FitMax < FitMaxAnt)
              % el mejor se movio y empeoro. Hay que recuperarlo y ponerlo donde estaba
@@ -93,10 +93,13 @@ function[R] = PSO_Multi(Datos, Clase, CantReglas, popsize, elitismo)
     disp(sprintf('\nIteraciones realizadas = %d',itera));
     disp(sprintf('\nMejor Individuo :'));
     disp(Pop(quien).individuo);
+    disp(sprintf('\nAptitud de cada elemento del Individuo :'));
+    disp(Pop(quien).fitIndividuo);
     disp(sprintf('\nAptitud del mejor individuo : %f',Pop(quien).fitness));
     disp(sprintf('\nVelocidad del mejor individuo :'));
     disp(Pop(quien).velocidad);
     disp(sprintf('\nUltimo valor de inercia utilizado : %f',w_inercia));
     disp(sprintf('\nEl mejor individuo no ha sido superado en las ultimas %d iteraciones',igualMejor));
-
+    
+    
 end

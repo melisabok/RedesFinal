@@ -24,7 +24,7 @@ for i=1:popsize
     %antes valido que no haya creado una regla nula
     nuevo = RemoverReglasNulas(nuevo, limites);
     
-    p = [p struct('individuo', nuevo, 'velocidad', veloc, 'pBest', nuevo, 'fitness',0,'fitpBest',0)];
+    p = [p struct('individuo', nuevo, 'velocidad', veloc, 'pBest', nuevo, 'fitness',0,'fitpBest',0, 'fitIndividuo', zeros(1, indsize))];
 end
 end
 
