@@ -87,7 +87,7 @@ function[R] = PSO_Multi(Datos, clase, cantReglas, popsize, elitismo)
          end    
 
          itera = itera + 1;
-
+ 
     end
 
     disp(sprintf('\nIteraciones realizadas = %d',itera));
